@@ -11,13 +11,13 @@
 
     <testsuites>
         <testsuite name="VirusTotal API wrapper Test Suite" >
-            <directory>../Src/</directory>
+            <directory>../</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory suffix=".php">../Src</directory>
+            <directory suffix=".php">../</directory>
         </whitelist>
     </filter>
 

@@ -18,7 +18,7 @@ class Domain extends ApiBase
                         'domain'   => $domain,
                         'apikey'   => $this->_apiKey,
                     ));
-        return $data->json();
+        return json_decode($data->getBody()->getContents(),true);
     }
 
 }

@@ -27,13 +27,14 @@ class ApiBase
 
     /**
      * Constructor
-     * @param string          $apiKey
+     * @param string $apiKey
      * @param ClientInterface $client
      */
-    public function __construct($apiKey, ClientInterface $client = null) {
-        $this->_apiKey =  $apiKey;
+    public function __construct($apiKey, ClientInterface $client = null)
+    {
+        $this->_apiKey = $apiKey;
 
-        if ( empty( $client) ) {
+        if (empty($client)) {
             $this->_client = new Client(array(
                 'base_uri' => self::API_ENDPOINT,
             ));
@@ -42,19 +43,26 @@ class ApiBase
 
     /**
      * Util function to make post request
-     * @param string          $endpoint
-     * @param array           $params
+     * @param string $endpoint
+     * @param array $params
      * @return (?)
      * @see Client
      * @throw \VirusTotal\Exceptions\RateLimitException
      * @throw \VirusTotal\Exceptions\InvalidApiKeyException
      */
-    protected function makePostRequest($endpoint, array $params) {
+    protected function makePostRequest($endpoint, array $params)
+    {
         try {
-            $response = $this->_client->post($endpoint, $params);
+            $postData = [];
+            if (empty($params['form_params'])) {
+                $postData['form_params'] = $params;
+            } else {
+                $postData = $params;
+            }
+            $response = $this->_client->post($endpoint, $postData);
             $this->validateResponse($response->getStatusCode());
             return $response;
-        } catch(ClientException $e) {
+        } catch (ClientException $e) {
             $this->validateResponse($e->getResponse()->getStatusCode());
         }
     }
@@ -62,13 +70,14 @@ class ApiBase
 
     /**
      * Util function to make get request
-     * @param string          $endpoint
-     * @param array           $params
+     * @param string $endpoint
+     * @param array $params
      * @return (?)
      * @throw \VirusTotal\Exceptions\RateLimitException
      * @throw \VirusTotal\Exceptions\InvalidApiKeyException
      */
-    protected function makeGetRequest($endpoint, array $params) {
+    protected function makeGetRequest($endpoint, array $params)
+    {
         // Constructs get url
         // e.g:
         // endpoint = 'ip-address/report'
@@ -81,11 +90,11 @@ class ApiBase
         // It maps to:
         // https://www.virustotal.com/vtapi/v2/ip-address/report?ip=192.168.2.1&apikey=supersecureapikey
         try {
-            $url = self::API_ENDPOINT . $endpoint . '?'. http_build_query($params);
+            $url = self::API_ENDPOINT . $endpoint . '?' . http_build_query($params);
             $response = $this->_client->get($url);
             $this->validateResponse($response->getStatusCode());
             return $response;
-        } catch(ClientException $e) {
+        } catch (ClientException $e) {
             $this->validateResponse($e->getResponse()->getStatusCode());
         }
     }
@@ -96,8 +105,9 @@ class ApiBase
      * @throw \VirusTotal\Exceptions\RateLimitException
      * @throw \VirusTotal\Exceptions\InvalidApiKeyException
      */
-    protected function validateResponse($statusCode) {
-        switch($statusCode) {
+    protected function validateResponse($statusCode)
+    {
+        switch ($statusCode) {
             case 204:
                 throw new Exceptions\RateLimitException('Too many requests');
             case 403:
