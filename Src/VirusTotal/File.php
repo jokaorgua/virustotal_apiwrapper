@@ -9,13 +9,14 @@ class File extends ApiBase
      */
     public function scan($file)
     {
+        var_dump($file);
         $data = $this->_client->post(self::API_ENDPOINT . 'file/scan', [
 
             'multipart' => [
                 [
                     'name' => 'file',
-                    'contents' => $file,
-                    'filename' => 'file.txt'
+                    'contents' => fopen($file,'r'),
+                    'filename' => $file
                 ],
                 [
                     'name' => 'apikey',
